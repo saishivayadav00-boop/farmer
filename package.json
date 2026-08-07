@@ -4,6 +4,9 @@
   "private": true,
   "description": "AgriConnect – Smart Farmer Portal full-stack web application built with React.js, Tailwind CSS, Flask, and SQLite.",
   "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd frontend && npm run preview",
+    "dev": "cd frontend && npm run dev",
     "start:frontend": "cd frontend && npm start",
     "build:frontend": "cd frontend && npm run build",
     "dev:frontend": "cd frontend && npm run dev",
