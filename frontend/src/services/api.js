@@ -1,8 +1,11 @@
 import axios from 'axios';
 
 // Central Axios API Service Instance
+// Uses Vercel Environment Variable VITE_API_BASE_URL if set, or defaults to local Flask server
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000/api';
+
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   },
@@ -26,7 +29,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear token on 401 Unauthorized
       localStorage.removeItem('token');
       localStorage.removeItem('user_role');
     }
