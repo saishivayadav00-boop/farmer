@@ -29,16 +29,20 @@ def upload_file_to_github(token, full_path, rel_path):
         "Accept": "application/vnd.github.v3+json"
     }
 
-    get_res = requests.get(url, headers=headers)
+    # Always fetch latest sha immediately before PUT request
     sha = None
-    if get_res.status_code == 200:
-        sha = get_res.json().get('sha')
+    try:
+        get_res = requests.get(url, headers=headers)
+        if get_res.status_code == 200:
+            sha = get_res.json().get('sha')
+    except Exception:
+        pass
 
     with open(full_path, 'rb') as file_obj:
         content_b64 = base64.b64encode(file_obj.read()).decode('utf-8')
 
     payload = {
-        "message": f"Upload {rel_path} - AgriConnect full-stack release",
+        "message": f"Upload {rel_path} - AgriConnect full-stack update",
         "content": content_b64,
         "branch": BRANCH
     }
