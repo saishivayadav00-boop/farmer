@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from backend.config import Config
 from backend.extensions import db, cors, migrate
 
@@ -21,7 +21,9 @@ from routes.blog_routes import blog_bp
 from routes.contact_routes import contact_bp
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    dist_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'frontend', 'dist'))
+    
+    app = Flask(__name__, static_folder=dist_folder if os.path.exists(dist_folder) else None)
     app.config.from_object(config_class)
 
     # Ensure database & upload directories exist
@@ -44,9 +46,28 @@ def create_app(config_class=Config):
     app.register_blueprint(blog_bp)
     app.register_blueprint(contact_bp)
 
-    # Root landing endpoint (prevents 404 error when visiting base URL)
-    @app.route('/', methods=['GET'])
-    def root_welcome():
+    # Health check endpoint
+    @app.route('/api/health', methods=['GET'])
+    def health_check():
+        return jsonify({
+            'status': 'online',
+            'database': 'SQLite connected',
+            'message': 'AgriConnect Backend API active & ready'
+        }), 200
+
+    # Catch-all route to serve React frontend SPA or API info
+    @app.route('/', defaults={'path': ''}, methods=['GET'])
+    @app.route('/<path:path>', methods=['GET'])
+    def catch_all(path):
+        if path.startswith('api/'):
+            return jsonify({'error': 'Endpoint not found'}), 404
+        
+        if os.path.exists(dist_folder) and os.path.exists(os.path.join(dist_folder, 'index.html')):
+            if path != "" and os.path.exists(os.path.join(dist_folder, path)):
+                return send_from_directory(dist_folder, path)
+            else:
+                return send_from_directory(dist_folder, 'index.html')
+        
         return jsonify({
             'status': 'online',
             'service': 'AgriConnect REST API Backend',
@@ -61,15 +82,6 @@ def create_app(config_class=Config):
                 'chat': '/api/chat',
                 'contact': '/api/contact'
             }
-        }), 200
-
-    # Health check endpoint
-    @app.route('/api/health', methods=['GET'])
-    def health_check():
-        return jsonify({
-            'status': 'online',
-            'database': 'SQLite connected',
-            'message': 'AgriConnect Backend API active & ready'
         }), 200
 
     # Auto-create tables if they don't exist
