@@ -1,0 +1,24 @@
+{
+  "name": "agriconnect-smart-farmer-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AgriConnect – Smart Farmer Portal full-stack web application built with React.js, Tailwind CSS, Flask, and SQLite.",
+  "scripts": {
+    "start:frontend": "cd frontend && npm start",
+    "build:frontend": "cd frontend && npm run build",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "python backend/app.py"
+  },
+  "keywords": [
+    "agriconnect",
+    "farmer-portal",
+    "react",
+    "tailwind",
+    "flask",
+    "sqlite",
+    "agriculture",
+    "smart-farming"
+  ],
+  "author": "",
+  "license": "MIT"
+}
