@@ -44,6 +44,25 @@ def create_app(config_class=Config):
     app.register_blueprint(blog_bp)
     app.register_blueprint(contact_bp)
 
+    # Root landing endpoint (prevents 404 error when visiting base URL)
+    @app.route('/', methods=['GET'])
+    def root_welcome():
+        return jsonify({
+            'status': 'online',
+            'service': 'AgriConnect REST API Backend',
+            'version': '1.0.0',
+            'endpoints': {
+                'health': '/api/health',
+                'weather': '/api/weather',
+                'crops': '/api/crops/recommend',
+                'mandi': '/api/mandi/prices',
+                'schemes': '/api/schemes',
+                'blogs': '/api/blogs',
+                'chat': '/api/chat',
+                'contact': '/api/contact'
+            }
+        }), 200
+
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])
     def health_check():
