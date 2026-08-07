@@ -4,15 +4,19 @@ from datetime import timedelta
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
 
+db_url = os.environ.get('DATABASE_URL', '')
+if db_url.startswith('postgres://'):
+    db_url = db_url.replace('postgres://', 'postgresql://', 1)
+
 class Config:
     """Base application configuration."""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'agriconnect_super_secret_jwt_key_2026')
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'agriconnect_jwt_auth_secret_key_9988')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
     
-    # SQLite Database Configuration
+    # SQLite / PostgreSQL Database Configuration
     DATABASE_PATH = os.path.join(PROJECT_ROOT, 'database', 'agriconnect.db')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', f'sqlite:///{DATABASE_PATH}')
+    SQLALCHEMY_DATABASE_URI = db_url if db_url else f'sqlite:///{DATABASE_PATH}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Uploads Configuration
@@ -20,9 +24,9 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB Max Upload Limit
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
-    # CORS Allowed Origins
-    CORS_HEADERS = 'Content-Type'
-    CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173']
+    # CORS Allowed Origins (Wildcard * allows any Vercel domain)
+    CORS_HEADERS = 'Content-Type, Authorization'
+    CORS_ORIGINS = '*'
 
 class DevelopmentConfig(Config):
     DEBUG = True
